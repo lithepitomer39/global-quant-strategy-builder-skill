@@ -1,0 +1,4 @@
+interface:
+  display_name: "Global Quant Strategy Builder"
+  short_description: "Build testable global, US, and Hong Kong strategies"
+  default_prompt: "Use $global-quant-strategy-builder to turn this market idea into a testable strategy change with explicit risk controls and validation evidence."
