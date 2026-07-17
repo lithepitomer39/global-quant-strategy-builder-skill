@@ -51,26 +51,77 @@
 
 ## 安裝
 
+先下載或複製本倉庫，並在倉庫根目錄執行以下指令。若想先了解代理會遵循的流程，可先閱讀 [skills/global-quant-strategy-builder/SKILL.md](skills/global-quant-strategy-builder/SKILL.md)。
+
 ### Codex（macOS / Linux）
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R skills/global-quant-strategy-builder "${CODEX_HOME:-$HOME/.codex}/skills/"
+skill_target="${CODEX_HOME:-$HOME/.codex}/skills/global-quant-strategy-builder"
+mkdir -p "$skill_target"
+cp -R skills/global-quant-strategy-builder/. "$skill_target/"
+test -f "$skill_target/SKILL.md"
 ```
 
 ### Codex（Windows PowerShell）
 
 ```powershell
 $codexRoot = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME ".codex" }
-New-Item -ItemType Directory -Force -Path (Join-Path $codexRoot "skills") | Out-Null
-Copy-Item -Recurse -Force ".\skills\global-quant-strategy-builder" (Join-Path $codexRoot "skills\global-quant-strategy-builder")
+$source = (Resolve-Path ".\skills\global-quant-strategy-builder").Path
+$target = Join-Path $codexRoot "skills\global-quant-strategy-builder"
+New-Item -ItemType Directory -Force -Path $target | Out-Null
+Copy-Item -Recurse -Force (Join-Path $source "*") $target
+Test-Path (Join-Path $target "SKILL.md")
 ```
 
-### Claude Code
+### Claude Code（使用者層級）
 
-把 `skills/global-quant-strategy-builder/` 複製到使用者層級的 `$HOME/.claude/skills/`，或專案層級的 `.claude/skills/`。
+macOS / Linux：
 
-## 可直接重用的提示詞
+```bash
+skill_target="$HOME/.claude/skills/global-quant-strategy-builder"
+mkdir -p "$skill_target"
+cp -R skills/global-quant-strategy-builder/. "$skill_target/"
+test -f "$skill_target/SKILL.md"
+```
+
+Windows PowerShell：
+
+```powershell
+$source = (Resolve-Path ".\skills\global-quant-strategy-builder").Path
+$target = Join-Path $HOME ".claude\skills\global-quant-strategy-builder"
+New-Item -ItemType Directory -Force -Path $target | Out-Null
+Copy-Item -Recurse -Force (Join-Path $source "*") $target
+Test-Path (Join-Path $target "SKILL.md")
+```
+
+若只想在單一專案使用 Claude Code，把同一目錄複製到目標倉庫的 `.claude/skills/global-quant-strategy-builder/`。重新複製以上檔案即可更新既有安裝；安裝或更新後，請開啟新的代理工作階段再試用。
+
+### 確認已安裝
+
+- Codex：在新任務中輸入 `使用 $global-quant-strategy-builder，審查這個策略想法，只列出需要補齊的策略契約。`
+- Claude Code：要求它「使用 `global-quant-strategy-builder` skill」處理同一項任務。
+- 其他相容 runtime：確認安裝目錄內的 `SKILL.md` 能被 runtime 掃描，並依該 runtime 的語法指定 skill。
+
+## 提示詞建議
+
+在 Codex 中可直接寫 `$global-quant-strategy-builder`；在 Claude Code 或其他相容代理中，改成「使用 `global-quant-strategy-builder` skill」即可。提示詞越清楚交代以下五項，結果通常越容易驗證：
+
+1. 要代理做設計、改程式碼，還是只讀審查
+2. 市場、資產、交易時段和標的池
+3. 使用的框架、資料源與現有倉庫限制
+4. 不可妥協的風險、成本、成交和變更範圍
+5. 期望的測試、回測與交付證據
+
+可套用這個格式：
+
+```text
+使用 $global-quant-strategy-builder，在 [市場／標的] 的 [框架／倉庫] 中，
+把 [策略想法或問題] 收斂成 [策略設計／最小程式碼變更／只讀審查]。
+請遵守 [資料時點、成本、風險和不可改動範圍]，
+並交付 [測試、回測、敏感度檢查、修改檔案和證據]。
+```
+
+### 可直接重用的提示詞
 
 - `使用 $global-quant-strategy-builder，把一個美股橫截面動量想法整理成可測試策略，明確時點一致的標的池、訊號滯後、換倉、成本和最小驗證計劃。`
 - `使用 $global-quant-strategy-builder，審查這個 LEAN 美股策略的公司行動、時區、下單時點和風險模型是否一致。`
@@ -78,6 +129,8 @@ Copy-Item -Recurse -Force ".\skills\global-quant-strategy-builder" (Join-Path $c
 - `使用 $global-quant-strategy-builder，檢查港股低波動策略是否正確處理半日市、惡劣天氣交易、T+2、指定賣空證券和港股通交易日。`
 - `使用 $global-quant-strategy-builder，為 SPY 場內期權輪動策略定義到期日、Delta、價差、提前指派和壓力測試規則。`
 - `使用 $global-quant-strategy-builder，把全球 ETF 配置策略改成多幣種淨值，並測試匯率、非同步收市和當地假期。`
+- `使用 $global-quant-strategy-builder，只審查這個 Backtrader 回測，不修改程式碼；按資料洩漏、成交、成本、風險和證據強度排序問題。`
+- `使用 $global-quant-strategy-builder，為商品期貨趨勢策略補齊連續合約、轉倉、夜盤、乘數、保證金和費用假設，保持最小改動。`
 
 更多繁體中文及英文範例見 [examples/prompt-gallery.md](examples/prompt-gallery.md)。
 
