@@ -2,6 +2,30 @@
 
 These prompts are agent-neutral. In Codex, invoke `$global-quant-strategy-builder` explicitly. In another compatible runtime, ask it to use the `global-quant-strategy-builder` skill.
 
+## 如何寫出更好的提示詞 / How to write a stronger prompt
+
+先選擇代理要執行的動作：策略設計、最小程式碼變更，或只讀審查。接著交代市場與標的、框架與資料、不可妥協的風險或成交假設，以及你希望看到的驗證證據。若正在處理既有倉庫，請明確要求沿用現有擴充點並避免無關重寫。
+
+Start by choosing the action: strategy design, a minimal code change, or a read-only review. Then state the market and instruments, framework and data, non-negotiable risk or fill assumptions, and the validation evidence you expect. For an existing repository, explicitly request reuse of current extension points and no unrelated rewrites.
+
+### 繁體中文模板
+
+```text
+使用 $global-quant-strategy-builder，在 [市場／標的] 的 [框架／倉庫] 中，
+把 [策略想法或問題] 收斂成 [策略設計／最小程式碼變更／只讀審查]。
+請遵守 [資料時點、成本、風險和不可改動範圍]，
+並交付 [測試、回測、敏感度檢查、修改檔案和證據]。
+```
+
+### English template
+
+```text
+Use $global-quant-strategy-builder in [market/instruments] and [framework/repository]
+to turn [idea or problem] into [strategy design/minimal code change/read-only review].
+Honor [data timing, cost, risk, and change-scope constraints],
+and deliver [tests, backtests, sensitivity checks, changed files, and evidence].
+```
+
 ## US equities and ETFs
 
 ### 繁體中文
