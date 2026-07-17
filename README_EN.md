@@ -51,26 +51,77 @@ The bundled references currently cover:
 
 ## Installation
 
+Download or clone this repository and run the following commands from its root. To inspect the procedure the agent will follow before installing it, read [skills/global-quant-strategy-builder/SKILL.md](skills/global-quant-strategy-builder/SKILL.md).
+
 ### Codex on macOS or Linux
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R skills/global-quant-strategy-builder "${CODEX_HOME:-$HOME/.codex}/skills/"
+skill_target="${CODEX_HOME:-$HOME/.codex}/skills/global-quant-strategy-builder"
+mkdir -p "$skill_target"
+cp -R skills/global-quant-strategy-builder/. "$skill_target/"
+test -f "$skill_target/SKILL.md"
 ```
 
 ### Codex on Windows PowerShell
 
 ```powershell
 $codexRoot = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME ".codex" }
-New-Item -ItemType Directory -Force -Path (Join-Path $codexRoot "skills") | Out-Null
-Copy-Item -Recurse -Force ".\skills\global-quant-strategy-builder" (Join-Path $codexRoot "skills\global-quant-strategy-builder")
+$source = (Resolve-Path ".\skills\global-quant-strategy-builder").Path
+$target = Join-Path $codexRoot "skills\global-quant-strategy-builder"
+New-Item -ItemType Directory -Force -Path $target | Out-Null
+Copy-Item -Recurse -Force (Join-Path $source "*") $target
+Test-Path (Join-Path $target "SKILL.md")
 ```
 
-### Claude Code
+### Claude Code at user scope
 
-Copy `skills/global-quant-strategy-builder/` to the user-level `$HOME/.claude/skills/` directory or to a project's `.claude/skills/` directory.
+On macOS or Linux:
 
-## Example prompts
+```bash
+skill_target="$HOME/.claude/skills/global-quant-strategy-builder"
+mkdir -p "$skill_target"
+cp -R skills/global-quant-strategy-builder/. "$skill_target/"
+test -f "$skill_target/SKILL.md"
+```
+
+On Windows PowerShell:
+
+```powershell
+$source = (Resolve-Path ".\skills\global-quant-strategy-builder").Path
+$target = Join-Path $HOME ".claude\skills\global-quant-strategy-builder"
+New-Item -ItemType Directory -Force -Path $target | Out-Null
+Copy-Item -Recurse -Force (Join-Path $source "*") $target
+Test-Path (Join-Path $target "SKILL.md")
+```
+
+For project-only Claude Code use, copy the same directory to `.claude/skills/global-quant-strategy-builder/` inside the target repository. Re-run the copy commands to update an existing installation, then start a new agent session.
+
+### Confirm the installation
+
+- Codex: start a new task with `Use $global-quant-strategy-builder to review this strategy idea and list only the missing strategy-contract details.`
+- Claude Code: ask it to use the `global-quant-strategy-builder` skill for the same task.
+- Other compatible runtimes: confirm that the runtime scans the installed `SKILL.md`, then invoke the skill with that runtime's syntax.
+
+## Prompt guidance
+
+In Codex, invoke `$global-quant-strategy-builder` directly. In Claude Code or another compatible agent, say “use the `global-quant-strategy-builder` skill.” Strong prompts normally state five things:
+
+1. whether the agent should design, edit code, or perform a read-only review;
+2. the market, asset, trading session, and universe;
+3. the framework, data source, and repository constraints;
+4. non-negotiable risk, cost, fill, and change-scope assumptions; and
+5. the tests, backtests, and delivery evidence expected.
+
+Use this template:
+
+```text
+Use $global-quant-strategy-builder in [market/instruments] and [framework/repository]
+to turn [idea or problem] into [strategy design/minimal code change/read-only review].
+Honor [data timing, cost, risk, and change-scope constraints],
+and deliver [tests, backtests, sensitivity checks, changed files, and evidence].
+```
+
+### Reusable prompts
 
 - `Use $global-quant-strategy-builder to turn a US equity cross-sectional momentum idea into a testable strategy with point-in-time membership, signal lag, turnover, costs, and a minimum validation plan.`
 - `Use $global-quant-strategy-builder to review this LEAN strategy for corporate actions, timezone handling, order timing, and risk-model consistency.`
@@ -79,6 +130,8 @@ Copy `skills/global-quant-strategy-builder/` to the user-level `$HOME/.claude/sk
 - `Use $global-quant-strategy-builder to specify an SPY options rotation strategy with expiry, delta, spread, early-assignment, and stress-test rules.`
 - `Use $global-quant-strategy-builder to make this global ETF allocation strategy multi-currency and test FX translation, asynchronous closes, and local holidays.`
 - `Use $global-quant-strategy-builder to audit the continuous contract, roll, multiplier, margin, and fee assumptions in this futures trend backtest.`
+- `Use $global-quant-strategy-builder to review this Backtrader backtest without editing code. Rank findings across leakage, fills, costs, risk, and evidence quality.`
+- `Use $global-quant-strategy-builder to add continuous-contract, roll, overnight-session, multiplier, margin, and fee assumptions to this commodity-futures trend strategy with the smallest safe diff.`
 
 See [examples/prompt-gallery.md](examples/prompt-gallery.md) for more prompts in English and Traditional Chinese.
 
